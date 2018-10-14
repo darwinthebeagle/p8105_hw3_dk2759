@@ -147,6 +147,7 @@ The goal is to do some exploration of this dataset. To that end, write a short d
 This dataset has `r nrow(instacart)` observations and `r ncol(instacart)` variables. Other than `eval_set`, `product_name`, `aisle`, and `department`, all variables are class `integer`. There are **`r instacart %>% distinct(aisle_id) %>% count()` aisles** and **`r instacart %>% distinct(department_id) %>% count()` departments** selling a total of **`r instacart %>% distinct(product_name) %>%  count()` unique products**
 
 How many aisles are there, and which aisles are the most items ordered from?
+There are **`r instacart %>% distinct(aisle_id) %>% count()` aisles**. And 
 Make a plot that shows the number of items ordered in each aisle. Order aisles sensibly, and organize your plot so others can read it.
 Make a table showing the most popular item in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”.
 Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).
