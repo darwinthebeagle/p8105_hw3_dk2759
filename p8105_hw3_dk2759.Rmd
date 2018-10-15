@@ -10,11 +10,10 @@ output: github_document
 library(tidyverse)
 library(ggridges)
 library(dplyr)
-library(haven)
 
 knitr::opts_chunk$set(
-  fig.width = 6,
-  fig.asp = .6,
+  fig.width = 10,
+  fig.asp = 1.0,
   out.width = "90%"
 )
 
@@ -236,10 +235,53 @@ instacart %>%
 ```
 
 ## Problem 3
-This problem uses the NY NOAA data. DO NOT include this dataset in your local data directory; instead, load the data from the  p8105.datasets package (it’s called ny_noaa).
+This problem uses the NY NOAA data.
+
+#### Summary
+
+```{r ny_noaa}
+data(ny_noaa)
+```
 
 The goal is to do some exploration of this dataset. To that end, write a short description of the dataset, noting the size and structure of the data, describing some key variables, and indicating the extent to which missing data is an issue. Then, do or answer the following (commenting on the results of each):
 
+```{r ny_noaa_summary}
+skimr::skim(ny_noaa)
+n_missing_tmin = ny_noaa %>%
+  mutate(tmin_na = is.na(tmin)) %>%
+  count(tmin_na) %>% filter(tmin_na == TRUE)
+
+n_missing_prcp = ny_noaa %>%
+  mutate(prcp_na = is.na(prcp)) %>%
+  count(prcp_na) %>% filter(prcp_na == TRUE)
+```
+
+
+This dataset has `r nrow(ny_noaa)` observations and `r ncol(ny_noaa)` variables. This dataset contains readings from `r ny_noaa %>% summarize(n_distinct(id))` weather stations. There are the following  variables. 
+
+* Character: `id`, `tmax`, `tmin`. 
+* Date: `date`
+* Integer: `prcp`, `snow`, `snwd`
+
+id: Weather station ID
+date: Date of observation
+prcp: Precipitation (tenths of mm)
+snow: Snowfall (mm)
+snwd: Snow depth (mm)
+tmax: Maximum temperature (tenths of degrees C)
+tmin: Minimum temperature (tenths of degrees C)
+
+There is a lot of missing data for `tmax` and `tmin`, as well `prcp`, `snow`, `snwd`. Only  `r ny_noaa %>% na.omit() %>% nrow()` observations have no missing values. For the `tmin` variable there are `r n_miss_tmin$n` missing values and for the `pcrp` variable there are `r n_missing_prcp$n` missing values.
+
+#### Cleaning Data
+
 Do some data cleaning. Create separate variables for year, month, and day. Ensure observations for temperature, precipitation, and snowfall are given in reasonable units. For snowfall, what are the most commonly observed values? Why?
+
+```{r}
+ny_noaa =  separate(date, into = c("year", "month", "day"))
+```
+
+
 Make a two-panel plot showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers?
+
 Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); and (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.
