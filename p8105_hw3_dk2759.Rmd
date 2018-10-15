@@ -30,24 +30,6 @@ This assignment reinforces ideas in Visualization and EDA.
 Due date
 Due: October 15 at 4:00pm.
 
-Points
-Problem 0: 10 points
-Problem 1: 30 points
-Problem 2: 30 points
-Problem 3: 30 points
-Problem 0
-This “problem” focuses on structure of your submission, especially the use git and GitHub for reproducibility, R Projects to organize your work, R Markdown to write reproducible reports, relative paths to load data from local files, and reasonable naming structures for your files.
-
-To that end:
-
-create a public GitHub repo + local R Project; we suggest naming this repo / directory p8105_hw3_YOURUNI (e.g.  p8105_hw3_ajg2202 for Jeff), but that’s not required
-create a single .Rmd file named p8105_hw3_YOURUNI.Rmd that renders to github_document
-Your solutions to Problems 1, 2, and 3 should be implemented in your .Rmd file, and your git commit history should reflect the process you used to solve these Problems.
-
-For this Problem, we will assess adherence to the instructions above regarding repo structure, git commit history, and whether we are able to knit your .Rmd to ensure that your work is reproducible. Adherence to appropriate styling and clarity of code will be assessed in Problems 1+ using the homework style rubric.
-
-This homework includes figures; the readability of your embedded plots (e.g. font sizes, axis labels, titles) will be assessed in Problems 1+.
-
 ## Problem 1
 This problem uses the BRFSS data. DO NOT include this dataset in your local data directory; instead, load the data from the  p8105.datasets package.
 
@@ -338,7 +320,7 @@ ny_noaa_snow = ny_noaa_clean %>%
   ggplot(aes(x = year, y = snow)) +  
   geom_boxplot() + 
    labs(
-    title = "Distribution of snowfall values greater than 0 and less than 100 mm by year",
+    title = "Distribution of snowfall values from 0 to 100mm by year",
     x = "Year",
     y = "Snowfall(mm)") + 
   theme(axis.text.x = element_text(angle = 60, hjust = 1)) 
