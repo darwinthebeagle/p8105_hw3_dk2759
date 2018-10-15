@@ -113,21 +113,45 @@ ggplot(brfss_smart2010_plot, aes(x = year, y = n_obs)) +
   )
 ```
 
-
 Make a table showing, for the years 2002, 2006, and 2010, the mean and standard deviation of the proportion of “Excellent” responses across locations in NY State.
 
-```{r}
+```{r table_of_excellence}
 brfss_smart2010_factor %>% 
-  filter(locationabbr == "NY", year == 2002 | year == 2006 | year == 2010) %>% 
-  group_by(locationdesc) %>%
-  filter(response == "Excellent") %>% 
-  count(sample_size)
-```
-## not sure how to do this one
-  summarize(mean_excellent = mean((response == "Excellent" * sample_size))/sample_size), na.rm = TRUE, standard_deviation = sd(response == "Excellent", na.rm = TRUE)) %>% 
+  filter(locationabbr == "NY", year == 2002 | year == 2006 | year == 2010, response == "Excellent") %>% 
+  group_by(year, locationdesc, locationabbr) %>%
+  spread(key = response, value = data_value) %>% 
+  janitor::clean_names() %>%
+  summarize(mean_excellent = mean(excellent), sd_excellent = sd(excellent, na.rm = TRUE)) %>% 
+  mutate(mean_excellent = mean(excellent / 100, 
+                              sd_excellent = sd(excelent / 100))) %>% 
   knitr::kable(digits = 3)
 
+```
+
+## not sure how to do make my SDs not NAs?
+  summarize(mean_excellent = mean((response == "Excellent" * sample_size))/sample_size), na.rm = TRUE, standard_deviation = sd(response == "Excellent", na.rm = TRUE)) %>% 
+
 For each year and state, compute the average proportion in each response category (taking the average across locations in a state). Make a five-panel plot that shows, for each response category separately, the distribution of these state-level averages over time.
+
+```{r average_response_category}
+brfss_smart2010_factor %>% 
+  group_by(year, locationabbr, response) %>%
+  summarize(mean_response = mean(data_value/100)) %>% 
+  ggplot(aes(x = year, y = mean_response)) + 
+  geom_point(color = locationabbr, alpha = 0.4) + 
+  geom_smooth(se = FALSE) +   
+  facet_grid(~response) +
+  labs(
+    title = "BRFSS Average Response by State from 2002 to 2010",
+    x = "Year",
+    y = "Average Response",
+    caption = "Data from the BRFSS package"
+  ) + 
+  viridis::scale_color_viridis(
+    name = "State", 
+    discrete = TRUE
+  )
+```
 
 ## Problem 2
 
@@ -142,16 +166,63 @@ This problem uses the Instacart data. DO NOT include this dataset in your local 
 
 The goal is to do some exploration of this dataset. To that end, write a short description of the dataset, noting the size and structure of the data, describing some key variables, and giving illustrative examples of observations. Then, do or answer the following (commenting on the results of each):
 
-### Summarize
+#### Summarize
 
 This dataset has `r nrow(instacart)` observations and `r ncol(instacart)` variables. Other than `eval_set`, `product_name`, `aisle`, and `department`, all variables are class `integer`. There are **`r instacart %>% distinct(aisle_id) %>% count()` aisles** and **`r instacart %>% distinct(department_id) %>% count()` departments** selling a total of **`r instacart %>% distinct(product_name) %>%  count()` unique products**
 
 How many aisles are there, and which aisles are the most items ordered from?
-There are **`r instacart %>% distinct(aisle_id) %>% count()` aisles**. And 
+There are **`r instacart %>% distinct(aisle_id) %>% count()` aisles**. `Fresh vegetables` and `fresh fruits` have the most ordered items.
+
+```{r aisle_order_counts}
+instacart %>%
+  group_by(aisle) %>% 
+  count(aisle) %>%
+  rename(count_aisle = n) %>% 
+  arrange(desc(count_aisle)) %>%
+  head() %>% 
+  knitr::kable()
+```
+
 Make a plot that shows the number of items ordered in each aisle. Order aisles sensibly, and organize your plot so others can read it.
+
+```{r instacart_orders_plot}
+instacart_plot = instacart %>%
+  group_by(aisle, aisle_id) %>% 
+  count(aisle) %>%
+  rename(count_aisle = n) %>%
+  arrange(desc(aisle_id))
+
+ggplot(instacart_plot, aes(x = aisle, y = count_aisle)) + 
+  geom_point(aes()) +
+  labs(
+    title = "Instacart Items Ordered per Aisle",
+    x = "Aisle",
+    y = "Number of Orders",
+    caption = "Data from the Instacart package"
+  ) + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+
 Make a table showing the most popular item in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”.
+
+
+```{r}
+instacart %>%
+  filter(aisle == "baking ingredients" | aisle == "dog food care" | aisle == "packaged vegetables fruits") %>%
+  group_by(aisle) %>% 
+  arrange(desc(aisle))
+  
+  rename(count_aisle = n) %>% 
+  arrange(desc(count_aisle)) %>%
+  head() %>% 
+  knitr::kable()
+```
+
 Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).
-Problem 3
+
+
+## Problem 3
 This problem uses the NY NOAA data. DO NOT include this dataset in your local data directory; instead, load the data from the  p8105.datasets package (it’s called ny_noaa).
 
 The goal is to do some exploration of this dataset. To that end, write a short description of the dataset, noting the size and structure of the data, describing some key variables, and indicating the extent to which missing data is an issue. Then, do or answer the following (commenting on the results of each):
