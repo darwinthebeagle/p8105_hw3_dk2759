@@ -117,15 +117,16 @@ Make a table showing, for the years 2002, 2006, and 2010, the mean and standard 
 
 ```{r table_of_excellence}
 brfss_smart2010_factor %>% 
-  filter(locationabbr == "NY", year == 2002 | year == 2006 | year == 2010, response == "Excellent") %>% 
+  filter(locationabbr == "NY", year == 2002 | year == 2006 | year == 2010, 
+         response == "Excellent") %>% 
   group_by(year, locationdesc, locationabbr) %>%
   spread(key = response, value = data_value) %>% 
   janitor::clean_names() %>%
-  summarize(mean_excellent = mean(excellent), sd_excellent = sd(excellent, na.rm = TRUE)) %>% 
-  mutate(mean_excellent = mean(excellent / 100, 
-                              sd_excellent = sd(excelent / 100))) %>% 
+  summarize(mean_excellent = mean(excellent), 
+            sd_excellent = sd(excellent, na.rm = TRUE)) %>% 
+  mutate(mean_excellent = 
+           mean_excellent / 100, sd_excellent = sd_excellent / 100) %>% 
   knitr::kable(digits = 3)
-
 ```
 
 ## not sure how to do make my SDs not NAs?
@@ -137,9 +138,8 @@ For each year and state, compute the average proportion in each response categor
 brfss_smart2010_factor %>% 
   group_by(year, locationabbr, response) %>%
   summarize(mean_response = mean(data_value/100)) %>% 
-  ggplot(aes(x = year, y = mean_response)) + 
-  geom_point(color = locationabbr, alpha = 0.4) + 
-  geom_smooth(se = FALSE) +   
+  ggplot(aes(x = year, y = mean_response, color = locationabbr)) + 
+  geom_line(alpha = 0.4) + 
   facet_grid(~response) +
   labs(
     title = "BRFSS Average Response by State from 2002 to 2010",
@@ -202,7 +202,6 @@ ggplot(instacart_plot, aes(x = aisle, y = count_aisle)) +
   ) + 
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
-
 
 Make a table showing the most popular item in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”.
 
