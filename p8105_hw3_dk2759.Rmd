@@ -31,7 +31,7 @@ Due date
 Due: October 15 at 4:00pm.
 
 ## Problem 1
-This problem uses the BRFSS data. DO NOT include this dataset in your local data directory; instead, load the data from the  p8105.datasets package.
+This problem uses the BRFSS data.
 
 ```{r}
 library(p8105.datasets)
@@ -46,10 +46,12 @@ data(brfss_smart2010)
 ```
 
 Cleaning
-* format the data to use appropriate variable names;
-* focus on the “Overall Health” topic
-* include only responses from “Excellent” to “Poor”
-* organize responses as a factor taking levels ordered from “Excellent” to “Poor”
+
+format the data to use appropriate variable names;
+
+* focus on the "Overall Health" topic
+* include only responses from "Excllent" to "Poor"
+* organize responses as a factor taking levels ordered from "Excellent" to "Poor"
 
 ```{r clean_brfss}
 brfss_smart2010_factor =
@@ -272,7 +274,17 @@ ny_noaa_clean = ny_noaa %>%
          ) 
 ```
 
-The most commonly observed snowfall value is `ny_noaa_clean %>% group_by(snow) %>% count(snow) %>% summarize(common_obs_snow = max(n, na.rm = TRUE)) %>% arrange(desc(common_obs_snow)) %>% top_n(1) %>% select(-common_obs_snow)`. Since it does not snow all year around in NY it makes sense that there are a lot of zero values. The most common nonzero snowfall is `ny_noaa_clean %>% group_by(snow) %>% count(snow) %>% summarize(common_obs_snow = max(n, na.rm = TRUE)) %>% arrange(desc(common_obs_snow)) %>% top_n(3) %>% select(-common_obs_snow)`. 
+The most commonly observed snowfall value is 0. Since it does not snow all year around in NY it makes sense that there are a lot of zero values. The most common nonzero snowfall is 25 mm. 
+
+```{r snow_values}
+ny_noaa_clean %>% 
+  group_by(snow) %>% 
+  count(snow) %>% 
+  summarize(common_obs_snow = max(n, na.rm = TRUE)) %>% 
+  arrange(desc(common_obs_snow)) %>% 
+  top_n(3) %>% 
+  select(-common_obs_snow)
+```
 
 #### Questions
 
@@ -293,8 +305,10 @@ ny_noaa_clean %>%
     caption = "Data from the NY_NOAA dataset") + 
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
 ```
+
 The overall temperature throughout is higher in July and lower in January (summer in July is hotter than winter in January in NY). There is a larger range of temperatures in the winter, some stations record below -20, while most stay within the -20 to 20 range. In the summer the temperatures cluster between 20 and 40 C. There are a few outliers such a 60 C recording in January 2005 and under -10 C in July 2006.
 
+****
 
 Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); and (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.
 
